@@ -4,8 +4,8 @@ from pydantic import BaseModel
 import spacy
 
 # pt_core_news_lg ou pt_core_news_md (mais leve)
-MODEL_NAME = "pt_core_news_lg"
-nlp = spacy.load(MODEL_NAME)
+MODEL_NAME = "pt_core_news_md"  
+nlp = None                       # lazy load
 
 app = FastAPI(title="NER-PT")
 
@@ -19,6 +19,10 @@ app.add_middleware(
 
 class InText(BaseModel):
     text: str
+
+@app.get("/health")
+def health():
+    return {"ok": True}
 
 @app.post("/ner")
 def ner(payload: InText):
@@ -43,4 +47,5 @@ def ner(payload: InText):
                         parts.append(p[:1].upper() + p[1:].lower())
                 names.add(" ".join(parts))
     return {"proper_names": sorted(names)}
+
 
